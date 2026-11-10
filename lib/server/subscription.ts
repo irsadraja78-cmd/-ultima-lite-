@@ -31,7 +31,7 @@ function getAdminClient(): SupabaseClient {
 export async function getSubscriptionAccess(
   userId: string
 ): Promise<SubscriptionAccess> {
-  if (process.env.ULTIMA_DEV_SUBSCRIPTION_BYPASS === "true") {
+  if (process.env.ULTIMA_SUBSCRIPTION_MODE !== "enabled") {
     return {
       allowed: true,
       source: "subscription",
