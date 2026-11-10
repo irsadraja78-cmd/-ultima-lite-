@@ -200,7 +200,7 @@ export async function POST(request: Request) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "Ultima Lite <onboarding@resend.dev>",
+          from: "Ultima Lite <no-reply@ultimalite.com>",
           to: [user.email],
           subject: `Ultima Lite — ${lockerName} Access OTP`,
           text:
