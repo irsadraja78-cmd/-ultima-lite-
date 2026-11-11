@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { verifyRegistrationResponse } from "@simplewebauthn/server";
 import {
-  adminDb, adminUser, consumeChallenge, fail, getChallenge, requestOrigin,
+  adminDb, adminOwner, consumeChallenge, fail, getChallenge, requestOrigin,
 } from "@/lib/server/admin-passkey-common";
 import { setAdminPasskeySession } from "@/lib/server/admin-passkey-session";
 
@@ -9,7 +9,7 @@ export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
-    const { user, response } = await adminUser(request);
+    const { user, response } = await adminOwner(request);
     if (response || !user) return response ?? fail("Unauthorized", 401);
 
     const site = requestOrigin(request);
@@ -35,8 +35,19 @@ export async function POST(request: Request) {
       return fail("Passkey verification सफल नहीं हुआ।", 400);
     }
 
-    const credential = verification.registrationInfo.credential;
     const db = adminDb();
+    const { data: existing, error: existingError } = await db
+      .from("admin_passkeys")
+      .select("id")
+      .eq("user_id", user.id)
+      .limit(1);
+
+    if (existingError) throw existingError;
+    if (existing?.length) {
+      return fail("इस Owner खाते में Passkey पहले से registered है।", 409);
+    }
+
+    const credential = verification.registrationInfo.credential;
     const { error } = await db.from("admin_passkeys").insert({
       user_id: user.id,
       credential_id: credential.id,

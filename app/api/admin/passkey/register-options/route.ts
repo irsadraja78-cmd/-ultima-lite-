@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
 import { generateRegistrationOptions } from "@simplewebauthn/server";
 import {
-  adminDb, adminUser, fail, requestOrigin, storeChallenge,
+  adminDb, adminOwner, fail, requestOrigin, storeChallenge,
 } from "@/lib/server/admin-passkey-common";
 
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
-    const { user, response } = await adminUser(request);
+    const { user, response } = await adminOwner(request);
     if (response || !user) return response ?? fail("Unauthorized", 401);
 
     const site = requestOrigin(request);
@@ -18,6 +18,10 @@ export async function POST(request: Request) {
     const { data: existing, error } = await db.from("admin_passkeys")
       .select("credential_id,transports").eq("user_id", user.id);
     if (error) throw error;
+
+    if (existing?.length) {
+      return fail("इस Owner खाते में Passkey पहले से registered है। मौजूदा Passkey से Login करें।", 409);
+    }
 
     const options = await generateRegistrationOptions({
       rpName: "Ultima Lite Admin",

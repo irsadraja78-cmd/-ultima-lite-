@@ -19,6 +19,32 @@ export async function adminUser(request: Request) {
   return { user: result.user, response: null };
 }
 
+export async function adminOwner(request: Request) {
+  const ownerId = process.env.ADMIN_OWNER_USER_ID?.trim();
+
+  if (!ownerId) {
+    return {
+      user: null,
+      response: fail("Super Admin Owner configuration missing.", 503),
+    };
+  }
+
+  const result = await requireRole(request, ["Super Admin"]);
+
+  if (result.response) {
+    return { user: null, response: result.response };
+  }
+
+  if (!result.user || result.user.id !== ownerId) {
+    return {
+      user: null,
+      response: fail("केवल अधिकृत Super Admin Owner Passkey register कर सकता है।", 403),
+    };
+  }
+
+  return { user: result.user, response: null };
+}
+
 export function requestOrigin(request: Request) {
   const origin = request.headers.get("origin");
   if (!origin) return null;
