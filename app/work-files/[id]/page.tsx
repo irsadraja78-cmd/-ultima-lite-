@@ -256,19 +256,13 @@ function PdfJsPreview({
           });
 
           const availableWidth = Math.max(
-            280,
-            Math.min(
-              container.clientWidth - 16,
-              1000
-            )
+            1,
+            Math.min(container.clientWidth - 16, 1000)
           );
 
-          const scale = Math.max(
-            0.5,
-            Math.min(
-              availableWidth / baseViewport.width,
-              2
-            )
+          const scale = Math.min(
+            availableWidth / baseViewport.width,
+            2
           );
 
           const viewport = page.getViewport({
@@ -287,8 +281,16 @@ function PdfJsPreview({
 
           const canvas = document.createElement("canvas");
           canvas.className = "block h-auto w-full";
-          canvas.width = Math.ceil(viewport.width);
-          canvas.height = Math.ceil(viewport.height);
+
+          const deviceScale = Math.min(
+            window.devicePixelRatio || 1,
+            2.5
+          );
+
+          canvas.width = Math.ceil(viewport.width * deviceScale);
+          canvas.height = Math.ceil(viewport.height * deviceScale);
+          canvas.style.width = `${viewport.width}px`;
+          canvas.style.height = `${viewport.height}px`;
 
           const context = canvas.getContext("2d");
 
@@ -297,6 +299,10 @@ function PdfJsPreview({
               "Unable to create PDF canvas."
             );
           }
+
+          context.setTransform(
+            deviceScale, 0, 0, deviceScale, 0, 0
+          );
 
           pageWrapper.appendChild(pageLabel);
           pageWrapper.appendChild(canvas);

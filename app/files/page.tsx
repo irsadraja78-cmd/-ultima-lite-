@@ -77,13 +77,13 @@ function PdfInlineViewer({
           const baseViewport = page.getViewport({ scale: 1 });
 
           const availableWidth = Math.max(
-            container.clientWidth - 24,
-            280
+            1,
+            container.clientWidth - 24
           );
 
-          const scale = Math.max(
-            0.6,
-            Math.min(2, availableWidth / baseViewport.width)
+          const scale = Math.min(
+            2,
+            availableWidth / baseViewport.width
           );
 
           const viewport = page.getViewport({ scale });
@@ -99,7 +99,7 @@ function PdfInlineViewer({
 
           const deviceScale = Math.min(
             window.devicePixelRatio || 1,
-            2
+            2.5
           );
 
           canvas.width = Math.floor(viewport.width * deviceScale);
