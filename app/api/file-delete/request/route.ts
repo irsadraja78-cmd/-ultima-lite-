@@ -303,7 +303,7 @@ export async function POST(request: Request) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "Ultima Lite <onboarding@resend.dev>",
+          from: "Ultima Lite Security <no-reply@ultimalite.com>",
           to: [user.email],
           subject: "Ultima Lite — Delete OTP",
           html: `
